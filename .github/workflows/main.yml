@@ -103,3 +103,4 @@ jobs:
           else
             git commit -m "$COMMIT_MSG"
             git push
+          fi
