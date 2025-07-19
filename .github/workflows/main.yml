@@ -128,7 +128,7 @@ jobs:
           plt.title('Mood Breakdown')
           plt.axis('equal')
           plt.tight_layout()
-          plt.savefig('assets/mood-chart.png')
+          plt.savefig('assets/mood-chart.png', dpi=200) 
           " > chart.py
           
                     python3 chart.py    
@@ -138,7 +138,7 @@ jobs:
           # Remove old chart image line if exists
           awk '!/\\!\\[Mood Chart\\]\\(mood-chart\\.png\\)/' .mood-log.md > .temp-log.md
 
-          echo -e "\n![Mood Chart](mood-chart.png)\n" >> .temp-log.md
+          echo -e "\n![Mood Chart](assets/mood-chart.png)\n" >> .temp-log.md
 
           mv .temp-log.md .mood-log.md    
 
