@@ -124,7 +124,7 @@ jobs:
           plt.title('Mood Breakdown')
           plt.axis('equal')
           plt.tight_layout()
-          plt.savefig('mood-chart.png')
+          plt.savefig('assets/mood-chart.png')
           " > chart.py
           
                     python3 chart.py    
@@ -141,10 +141,10 @@ jobs:
       - name: ✅ Commit & Push
         run: |
           git add .mood-log.md
+          git add .mood-log.md mood-chart.png
           if git diff --cached --quiet; then
             echo "🛑 No changes to commit."
           else
             git commit -m "$COMMIT_MSG"
-            git add .mood-log.md mood-chart.png
             git push
           fi
