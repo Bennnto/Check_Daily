@@ -1,3 +1,4 @@
+
 name: 🎧 Mood Markdown Music Commit
 
 on:
@@ -57,8 +58,8 @@ jobs:
           echo 'MUSIC["🥳 feeling myself"]="https://music.apple.com/us/album/lust-for-life-feat-the-weeknd/1440905176?i=1440905631"' >> write_mood.sh
 
           echo 'TRACK=${MUSIC[$MOOD]}' >> write_mood.sh
-          echo 'echo "# 🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "**Mood**: $MOOD" >> .mood-log.md' >> write_mood.sh
+          echo 'echo "🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md' >> write_mood.sh
+          echo 'echo "😶**Mood**: $MOOD" >> .mood-log.md' >> write_mood.sh
           echo 'echo "**Note**: $NOTE" >> .mood-log.md' >> write_mood.sh
           echo 'echo "**Track**: [Link]($TRACK)" >> .mood-log.md' >> write_mood.sh
           echo 'echo "" >> .mood-log.md' >> write_mood.sh
