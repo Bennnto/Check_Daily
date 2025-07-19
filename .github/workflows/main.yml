@@ -96,6 +96,14 @@ jobs:
             COMMIT_MSG="$COMMIT_MSG — ${{ github.event.inputs.note }}"
           fi
           echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_ENV
+      - name: 🖼️ Insert Mood Chart into Markdown
+        run: |
+          # Remove old chart image line if exists
+          awk '!/\\!\\[Mood Chart\\]\\(mood-chart\\.png\\)/' .mood-log.md > .temp-log.md
+
+          echo -e "\n![Mood Chart](mood-chart.png)\n" >> .temp-log.md
+
+          mv .temp-log.md .mood-log.md    
 
       - name: ✅ Commit & Push
         run: |
