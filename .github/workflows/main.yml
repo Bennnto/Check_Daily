@@ -42,26 +42,27 @@ jobs:
           echo 'NOTE="${{ github.event.inputs.note }}"' >> write_mood.sh
           echo 'TIMESTAMP=$(date -u +"%Y-%m-%d")' >> write_mood.sh
           echo 'DATETIME_FULL=$(date -u)' >> write_mood.sh
+          - echo 'cat << EOF > write_mood.sh
+#!/bin/bash
+declare -A MUSIC
+MUSIC["😎 chillin"]="https://music.apple.com/us/album/chihiro/1732431344?i=1732431353"
+MUSIC["🔥 motivated"]="https://music.apple.com/us/album/new-normal/1576256376?i=1576256623"
+MUSIC["🤯 overwhelmed"]="https://music.apple.com/us/album/i-can-die-now/1735241727?i=1735241734"
+MUSIC["😭 sad boi hours"]="https://music.apple.com/us/album/vasopressin/1733689891?i=1733689892"
+MUSIC["🧘‍♂️ zen mode"]="https://music.apple.com/us/album/die-with-a-smile/1580118092?i=1580118094"
+MUSIC["🥱 sleepy af"]="https://music.apple.com/us/album/wake-me-up/1709437960?i=1709437963"
+MUSIC["😤 grinding"]="https://music.apple.com/us/album/gravity/1450646638?i=1450646646"
+MUSIC["🤖 robot mode"]="https://music.apple.com/us/album/superposition/1448216613?i=1448216622"
+MUSIC["🥳 feeling myself"]="https://music.apple.com/us/album/lust-for-life-feat-the-weeknd/1440905176?i=1440905176"
 
-          echo 'declare -A MUSIC' >> write_mood.sh
-          echo 'MUSIC["😎 chillin"]="https://music.apple.com/us/album/chihiro/1732431344?i=1732431353"' >> write_mood.sh
-          echo 'MUSIC["🔥 motivated"]="https://music.apple.com/us/album/new-normal/1576256376?i=1576256623"' >> write_mood.sh
-          echo 'MUSIC["🤯 overwhelmed"]="https://music.apple.com/us/album/i-can-die-now/1735241727?i=1735241734"' >> write_mood.sh
-          echo 'MUSIC["😭 sad boi hours"]="https://music.apple.com/us/album/vasopressin/1733689891?i=1733689892"' >> write_mood.sh
-          echo 'MUSIC["🧘‍♂️ zen mode"]="https://music.apple.com/us/album/die-with-a-smile/1580118092?i=1580118094"' >> write_mood.sh
-          echo 'MUSIC["🥱 sleepy af"]="https://music.apple.com/us/album/wake-me-up/1709437960?i=1709437963"' >> write_mood.sh
-          echo 'MUSIC["😤 grinding"]="https://music.apple.com/us/album/gravity/1450646638?i=1450646646"' >> write_mood.sh
-          echo 'MUSIC["🤖 robot mode"]="https://music.apple.com/us/album/superposition/1448216613?i=1448216622"' >> write_mood.sh
-          echo 'MUSIC["🥳 feeling myself"]="https://music.apple.com/us/album/lust-for-life-feat-the-weeknd/1440905176?i=1440905631"' >> write_mood.sh
-
-          echo 'TRACK=${MUSIC[$MOOD]}' >> write_mood.sh
-          echo 'echo "# 🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "**Mood**: $MOOD" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "**Note**: $NOTE" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "**Track**: [Link]($TRACK)" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "---" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "" >> .mood-log.md' >> write_mood.sh
+TRACK=\${MUSIC["\$MOOD"]}
+echo "🎧 Mood: \$MOOD"
+echo "🔗 Track: \$TRACK"
+EOF' >> write_mood.sh
+          
+           'echo "" >> .mood-log.md' >> write_mood.sh 
+           'echo "---" >> .mood-log.md' >> write_mood.sh
+           'echo "" >> .mood-log.md' >> write_mood.sh
 
           bash write_mood.sh
 
