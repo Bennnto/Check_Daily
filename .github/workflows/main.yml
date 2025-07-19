@@ -96,6 +96,39 @@ jobs:
             COMMIT_MSG="$COMMIT_MSG — ${{ github.event.inputs.note }}"
           fi
           echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_ENV
+      - name: 🐍 Set up Python
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install matplotlib    
+      - name: 📊 Generate Pie Chart
+        run: |
+          echo "
+          import matplotlib.pyplot as plt
+          from collections import Counter
+          import re
+          
+          # Parse moods
+          with open('.mood-log.md', 'r') as f:
+              lines = f.readlines()
+          
+          moods = [re.search(r'\*\*Mood\*\*: (.*?)\\n?', line).group(1) for line in lines if '**Mood**:' in line]
+          counts = Counter(moods)
+          
+          labels = list(counts.keys())
+          sizes = list(counts.values())
+          
+          colors = plt.cm.Paired(range(len(labels)))
+          
+          plt.figure(figsize=(6,6))
+          plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+          plt.title('Mood Breakdown')
+          plt.axis('equal')
+          plt.tight_layout()
+          plt.savefig('mood-chart.png')
+          " > chart.py
+          
+                    python3 chart.py    
+          
       - name: 🖼️ Insert Mood Chart into Markdown
         run: |
           # Remove old chart image line if exists
@@ -112,5 +145,6 @@ jobs:
             echo "🛑 No changes to commit."
           else
             git commit -m "$COMMIT_MSG"
+            git add .mood-log.md mood-chart.png
             git push
           fi
