@@ -22,6 +22,8 @@ on:
         description: "Write your vibe or story for the day"
         required: false
         default: ""
+permissions:
+  contents: write
 
 jobs:
   mood_commit:
