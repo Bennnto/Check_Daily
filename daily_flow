@@ -1,0 +1,109 @@
+name: 🎧 Mood Markdown Music Commit
+
+on:
+  workflow_dispatch:
+    inputs:
+      mood:
+        description: "Pick your mood of the day"
+        required: true
+        default: "😎 chillin"
+        type: choice
+        options:
+          - 😎 chillin
+          - 🔥 motivated
+          - 🤯 overwhelmed
+          - 😭 sad boi hours
+          - 🧘‍♂️ zen mode
+          - 🥱 sleepy af
+          - 😤 grinding
+          - 🤖 robot mode
+          - 🥳 feeling myself
+      note:
+        description: "Write your vibe or story for the day"
+        required: false
+        default: ""
+
+jobs:
+  mood_commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Set up Git
+        run: |
+          git config --global user.name "Bennnnip 🤖"
+          git config --global user.email "vissarut.prom@gmail.com"
+
+      - name: 🎧 Write mood + music to .md
+        run: |
+          MOOD="${{ github.event.inputs.mood }}"
+          NOTE="${{ github.event.inputs.note }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%d")
+          DATETIME_FULL=$(date -u)
+
+          # Define Apple Music links for each mood
+          declare -A MUSIC
+          MUSIC["😎 chillin"]="https://music.apple.com/us/album/sunday-best/1454659982?i=1454659987"
+          MUSIC["🔥 motivated"]="https://music.apple.com/ca/album/new-normal/1576557397?i=1576557406"
+          MUSIC["🤯 overwhelmed"]="https://music.apple.com/ca/album/vasopressin/1714470210?i=1714470211"
+          MUSIC["😭 sad boi hours"]="https://music.apple.com/ca/album/i-can-die-now/1822225425?i=1822225428"
+          MUSIC["🧘‍♂️ zen mode"]="https://music.apple.com/us/album/weightless/435705512?i=435705517"
+          MUSIC["🥱 sleepy af"]="https://music.apple.com/us/album/satellite/1468058165?i=1468058175"
+          MUSIC["😤 grinding"]="https://music.apple.com/us/album/remember-the-name/292034469?i=292034491"
+          MUSIC["🤖 robot mode"]="https://music.apple.com/us/album/tron-legacy-end-titles/406080457?i=406080679"
+          MUSIC["🥳 feeling myself"]="https://music.apple.com/us/album/feel-yourself/1515517805?i=1515517815"
+
+          TRACK=${MUSIC[$MOOD]}
+
+          echo -e "# 🧠 Mood Entry — $TIMESTAMP\n" >> .mood-log.md
+          echo "**Mood**: $MOOD" >> .mood-log.md
+          echo "**Note**: $NOTE" >> .mood-log.md
+          echo "**Track**: [Link]($TRACK)" >> .mood-log.md
+          echo -e "\n---\n" >> .mood-log.md
+
+          COMMIT_MSG="🌈 Mood Check-in: $MOOD"
+          if [ -n "$NOTE" ]; then
+            COMMIT_MSG="$COMMIT_MSG — $NOTE"
+          fi
+          echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_ENV
+
+      - name: ✅ Commit & Push
+        run: |
+          git add .mood-log.md
+          if git diff --cached --quiet; then
+            echo "🛑 No changes to commit."
+          else
+            git commit -m "$COMMIT_MSG"
+            git push
+
+      - name: 📊 Generate Mood Pie Chart
+        run: |
+          echo "
+import matplotlib.pyplot as plt
+from collections import Counter
+import re
+
+# Read mood entries from the markdown file
+with open('.mood-log.md', 'r') as f:
+    lines = f.readlines()
+
+mood_lines = [line for line in lines if line.startswith('**Mood**')]
+moods = [re.search(r'\\*\\*Mood\\*\\*: (.*?)\\n?', line).group(1) for line in mood_lines]
+
+counts = Counter(moods)
+
+labels = list(counts.keys())
+sizes = list(counts.values())
+
+colors = plt.cm.Set3(range(len(labels)))  # colorful palette
+
+plt.figure(figsize=(6,6))
+plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+plt.title('Mood Distribution')
+plt.axis('equal')
+plt.savefig('mood-chart.png')
+" > gen_mood_chart.py
+
+          python3 gen_mood_chart.py
