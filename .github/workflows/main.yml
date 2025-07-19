@@ -70,34 +70,35 @@ jobs:
 
       - name: 📊 Generate Mood Summary
         run: |
-        awk '
-        BEGIN {
-          print "## 📊 Mood Stats (Auto Summary)\n";
-          printf "| Mood               | Count |\n";
-          printf "|--------------------|-------|\n";
-        }
-        /^\*\*Mood\*\*: / {
-          sub(/\*\*Mood\*\*: /, "", $0);
-          counts[$0]++;
-        }
-        END {
-          total = 0;
-          for (mood in counts) {
-            printf "| %-18s | %5d |\n", mood, counts[mood];
-            total += counts[mood];
-          }
-          printf "\n_Total Entries: %d_\n\n---\n", total;
-        }' .mood-log.md > .mood-stats.md
-    
-        awk '/^## 📊 Mood Stats/,/^---/{next} {print}' .mood-log.md > .mood-log-clean.md
-        cat .mood-log-clean.md .mood-stats.md > .mood-log.md
-        rm .mood-log-clean.md .mood-stats.md
-    
-        COMMIT_MSG="🌈 Mood Check-in: ${{ github.event.inputs.mood }}"
-        if [ -n "${{ github.event.inputs.note }}" ]; then
-          COMMIT_MSG="$COMMIT_MSG — ${{ github.event.inputs.note }}"
-        fi
-        echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_ENV
+          awk '
+            BEGIN {
+              print "## 📊 Mood Stats (Auto Summary)\n";
+              printf "| Mood               | Count |\n";
+              printf "|--------------------|-------|\n";
+            }
+            /^\*\*Mood\*\*: / {
+              sub(/\*\*Mood\*\*: /, "", $0);
+              counts[$0]++;
+            }
+            END {
+              total = 0;
+              for (mood in counts) {
+                printf "| %-18s | %5d |\n", mood, counts[mood];
+                total += counts[mood];
+              }
+              printf "\n_Total Entries: %d_\n\n---\n", total;
+            }
+          ' .mood-log.md > .mood-stats.md
+      
+          awk '/^## 📊 Mood Stats/,/^---/{next} {print}' .mood-log.md > .mood-log-clean.md
+          cat .mood-log-clean.md .mood-stats.md > .mood-log.md
+          rm .mood-log-clean.md .mood-stats.md
+      
+          COMMIT_MSG="🌈 Mood Check-in: ${{ github.event.inputs.mood }}"
+          if [ -n "${{ github.event.inputs.note }}" ]; then
+            COMMIT_MSG="$COMMIT_MSG — ${{ github.event.inputs.note }}"
+          fi
+          echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_ENV
       - name: 🐍 Set up Python
         run: |
           python3 -m pip install --upgrade pip
