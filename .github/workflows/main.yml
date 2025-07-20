@@ -107,7 +107,7 @@ jobs:
           import os
           os.makedirs('assets', exist_ok=True)
           with open('.mood-log.md', 'r') as f:
-          ines = f.readlines()
+          lines = f.readlines()
             
           moods = [re.search(r'\*\*Mood\*\*: (.*?)\\n?', line).group(1) for line in lines if '**Mood**:' in line]
           counts = Counter(moods)
