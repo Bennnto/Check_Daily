@@ -69,10 +69,10 @@ jobs:
           bash write_mood.sh
 
      name: 📊 Generate Mood Summary
-  run: |
-    cat <<'EOF' | awk -f - .mood-log.md > .mood-stats.md
-    BEGIN {
-      print "## 📊 Mood Stats (Auto Summary)\n";
+      run: |
+        cat <<'EOF' | awk -f - .mood-log.md > .mood-stats.md
+        BEGIN {
+          print "## 📊 Mood Stats (Auto Summary)\n";
       printf "| Mood               | Count |\n";
       printf "|--------------------|-------|\n";
     }
