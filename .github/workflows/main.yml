@@ -105,11 +105,9 @@ jobs:
           from collections import Counter
           import re
           import os
-
-            os.makedirs('assets', exist_ok=True)
-            
+          os.makedirs('assets', exist_ok=True)
             with open('.mood-log.md', 'r') as f:
-                lines = f.readlines()
+            lines = f.readlines()
             
             moods = [re.search(r'\*\*Mood\*\*: (.*?)\\n?', line).group(1) for line in lines if '**Mood**:' in line]
             counts = Counter(moods)
