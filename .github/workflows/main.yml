@@ -1,4 +1,3 @@
-
 name: 🎧 Mood Markdown Music Commit
 
 on:
@@ -23,12 +22,14 @@ on:
         description: "Write your vibe or story for the day"
         required: false
         default: ""
+
 permissions:
   contents: write
 
 jobs:
   mood_commit:
     runs-on: ubuntu-latest
+
     steps:
       - name: 📦 Checkout repo
         uses: actions/checkout@v4
@@ -40,107 +41,106 @@ jobs:
 
       - name: 🎧 Write mood + music to .md
         run: |
-          echo '#!/bin/bash' > write_mood.sh
-          echo 'MOOD="${{ github.event.inputs.mood }}"' >> write_mood.sh
-          echo 'NOTE="${{ github.event.inputs.note }}"' >> write_mood.sh
-          echo 'TIMESTAMP=$(date -u +"%Y-%m-%d")' >> write_mood.sh
+          MOOD="${{ github.event.inputs.mood }}"
+          NOTE="${{ github.event.inputs.note }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%d")
 
-          echo 'declare -A MUSIC' >> write_mood.sh
-          echo 'MUSIC["😎 chillin"]="https://music.apple.com/us/album/chihiro/1732431344?i=1732431353"' >> write_mood.sh
-          echo 'MUSIC["🔥 motivated"]="https://music.apple.com/us/album/new-normal/1576256376?i=1576256623"' >> write_mood.sh
-          echo 'MUSIC["🤯 overwhelmed"]="https://music.apple.com/us/album/i-can-die-now/1735241727?i=1735241734"' >> write_mood.sh
-          echo 'MUSIC["😭 sad boi hours"]="https://music.apple.com/us/album/vasopressin/1733689891?i=1733689892"' >> write_mood.sh
-          echo 'MUSIC["🧘‍♂️ zen mode"]="https://music.apple.com/us/album/die-with-a-smile/1580118092?i=1580118094"' >> write_mood.sh
-          echo 'MUSIC["🥱 sleepy af"]="https://music.apple.com/us/album/wake-me-up/1709437960?i=1709437963"' >> write_mood.sh
-          echo 'MUSIC["😤 grinding"]="https://music.apple.com/us/album/gravity/1450646638?i=1450646646"' >> write_mood.sh
-          echo 'MUSIC["🤖 robot mode"]="https://music.apple.com/us/album/superposition/1448216613?i=1448216622"' >> write_mood.sh
-          echo 'MUSIC["🥳 feeling myself"]="https://music.apple.com/us/album/lust-for-life-feat-the-weeknd/1440905176?i=1440905631"' >> write_mood.sh
+          declare -A MUSIC
+          MUSIC["😎 chillin"]="https://music.apple.com/us/album/chihiro/1732431344?i=1732431353"
+          MUSIC["🔥 motivated"]="https://music.apple.com/us/album/new-normal/1576256376?i=1576256623"
+          MUSIC["🤯 overwhelmed"]="https://music.apple.com/us/album/i-can-die-now/1735241727?i=1735241734"
+          MUSIC["😭 sad boi hours"]="https://music.apple.com/us/album/vasopressin/1733689891?i=1733689892"
+          MUSIC["🧘‍♂️ zen mode"]="https://music.apple.com/us/album/die-with-a-smile/1580118092?i=1580118094"
+          MUSIC["🥱 sleepy af"]="https://music.apple.com/us/album/wake-me-up/1709437960?i=1709437963"
+          MUSIC["😤 grinding"]="https://music.apple.com/us/album/gravity/1450646638?i=1450646646"
+          MUSIC["🤖 robot mode"]="https://music.apple.com/us/album/superposition/1448216613?i=1448216622"
+          MUSIC["🥳 feeling myself"]="https://music.apple.com/us/album/lust-for-life-feat-the-weeknd/1440905176?i=1440905631"
 
-          echo 'TRACK=${MUSIC[$MOOD]}' >> write_mood.sh
-          echo 'echo "🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "😶**Mood**: $MOOD" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "**Note**: $NOTE" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "**Track**: [Link]($TRACK)" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "---" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "" >> .mood-log.md' >> write_mood.sh
+          TRACK=${MUSIC[$MOOD]}
 
-          bash write_mood.sh
+          echo "🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md
+          echo "😶**Mood**: $MOOD" >> .mood-log.md
+          echo "**Note**: $NOTE" >> .mood-log.md
+          echo "**Track**: [Link]($TRACK)" >> .mood-log.md
+          echo "" >> .mood-log.md
+          echo "---" >> .mood-log.md
+          echo "" >> .mood-log.md
 
-     - name: 📊 Generate Mood Summary
-       run: | cat <<'EOF' | awk -f - .mood-log.md > .mood-stats.md
+          echo "COMMIT_MSG=🌈 Mood Check-in: $MOOD — $NOTE" >> $GITHUB_ENV
+
+      - name: 📊 Generate Mood Summary
+        run: |
+          awk '
           BEGIN {
             print "## 📊 Mood Stats (Auto Summary)\n";
             printf "| Mood               | Count |\n";
             printf "|--------------------|-------|\n";
-      /^\*\*Mood\*\*: / {
-          sub(/\*\*Mood\*\*: /, "", $0);
-          counts[$0]++;
-    }
-      END {
-        total = 0;
-        for (mood in counts) {
-          printf "| %-18s | %5d |\n", mood, counts[mood];
-          total += counts[mood];
-      }
-        printf "\n_Total Entries: %d_\n\n---\n", total;
-    }
-      EOF
-      awk '/^## 📊 Mood Stats/,/^---/{next} {print}' .mood-log.md > .mood-log-clean.md
-      cat .mood-log-clean.md .mood-stats.md > .mood-log.md
-      rm .mood-log-clean.md .mood-stats.md
+          }
+          /^\*\*Mood\*\*: / {
+            sub(/\*\*Mood\*\*: /, "", $0);
+            counts[$0]++;
+          }
+          END {
+            total = 0;
+            for (mood in counts) {
+              printf "| %-18s | %5d |\n", mood, counts[mood];
+              total += counts[mood];
+            }
+            printf "\n_Total Entries: %d_\n\n---\n", total;
+          }' .mood-log.md > .mood-stats.md
+
+          awk '/^## 📊 Mood Stats/,/^---/{next} {print}' .mood-log.md > .mood-log-clean.md
+          cat .mood-log-clean.md .mood-stats.md > .mood-log.md
+          rm .mood-log-clean.md .mood-stats.md
+
       - name: 🐍 Set up Python
         run: |
           python3 -m pip install --upgrade pip
-          pip install matplotlib    
+          pip install matplotlib
+
       - name: 📊 Generate Pie Chart
         run: |
           echo "
-          import matplotlib.pyplot as plt
-          from collections import Counter
-          import re
-          import os
+import matplotlib.pyplot as plt
+from collections import Counter
+import re
+import os
 
-          os.makedirs('assets', exist_ok=True)
-          
-          # Parse moods
-          with open('.mood-log.md', 'r') as f:
-              lines = f.readlines()
-          
-          moods = [re.search(r'\*\*Mood\*\*: (.*?)\\n?', line).group(1) for line in lines if '**Mood**:' in line]
-          counts = Counter(moods)
-          
-          labels = list(counts.keys())
-          sizes = list(counts.values())
-          
-          colors = plt.cm.Paired(range(len(labels)))
-          
-          plt.figure(figsize=(6,6))
-          plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
-          plt.title('Mood Breakdown')
-          plt.axis('equal')
-          plt.tight_layout()
-          plt.savefig('assets/mood-chart.png', dpi=200) 
-          " > chart.py
-          
-                    python3 chart.py    
-          
+os.makedirs('assets', exist_ok=True)
+
+with open('.mood-log.md', 'r') as f:
+    lines = f.readlines()
+
+moods = [re.search(r'\*\*Mood\*\*: (.*?)\\n?', line).group(1) for line in lines if '**Mood**:' in line]
+counts = Counter(moods)
+
+labels = list(counts.keys())
+sizes = list(counts.values())
+
+colors = plt.cm.Paired(range(len(labels)))
+
+plt.figure(figsize=(6,6))
+plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+plt.title('Mood Breakdown')
+plt.axis('equal')
+plt.tight_layout()
+plt.savefig('assets/mood-chart.png', dpi=200)
+" > chart.py
+          python3 chart.py
+
       - name: 🖼️ Insert Mood Chart into Markdown
         run: |
-          # Remove old chart image line if exists
-          awk '!/\\!\\[Mood Chart\\]\\(mood-chart\\.png\\)/' .mood-log.md > .temp-log.md
-
+          awk '!/\!\[Mood Chart\]\(assets\/mood-chart\.png\)/' .mood-log.md > .temp-log.md
           echo -e "\n![Mood Chart](assets/mood-chart.png)\n" >> .temp-log.md
-
-          mv .temp-log.md .mood-log.md    
+          mv .temp-log.md .mood-log.md
 
       - name: ✅ Commit & Push
         run: |
-          git add .mood-log.md
           git add .mood-log.md assets/mood-chart.png
           if git diff --cached --quiet; then
             echo "🛑 No changes to commit."
           else
-            git commit -m "$COMMIT_MSG"
+            git commit -m \"$COMMIT_MSG\"
             git push
-          fi
+
+     
