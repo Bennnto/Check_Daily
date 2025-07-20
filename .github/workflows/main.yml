@@ -107,21 +107,21 @@ jobs:
           import os
           os.makedirs('assets', exist_ok=True)
           with open('.mood-log.md', 'r') as f:
-          lines = f.readlines()
+            lines = f.readlines()
             
-          moods = [re.search(r'\*\*Mood\*\*: (.*?)\\n?', line).group(1) for line in lines if '**Mood**:' in line]
-          counts = Counter(moods)
-          labels = list(counts.keys())
-          sizes = list(counts.values())
-          colors = plt.cm.Paired(range(len(labels)))
-            plt.figure(figsize=(6,6))
-            plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
-            plt.title('Mood Breakdown')
-            plt.axis('equal')
-            plt.tight_layout()
-            plt.savefig('assets/mood-chart.png', dpi=200)
-            " > chart.py
-                      python3 chart.py
+            moods = [re.search(r'\*\*Mood\*\*: (.*?)\\n?', line).group(1) for line in lines if '**Mood**:' in line]
+            counts = Counter(moods)
+            labels = list(counts.keys())
+            sizes = list(counts.values())
+            colors = plt.cm.Paired(range(len(labels)))
+              plt.figure(figsize=(6,6))
+              plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+              plt.title('Mood Breakdown')
+              plt.axis('equal')
+              plt.tight_layout()
+              plt.savefig('assets/mood-chart.png', dpi=200)
+              " > chart.py
+                        python3 chart.py
 
       - name: 🖼️ Insert Mood Chart into Markdown
         run: |
