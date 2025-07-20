@@ -68,8 +68,7 @@ jobs:
           bash write_mood.sh
 
      - name: 📊 Generate Mood Summary
-      run: |
-        cat <<'EOF' | awk -f - .mood-log.md > .mood-stats.md
+       run: | cat <<'EOF' | awk -f - .mood-log.md > .mood-stats.md
           BEGIN {
             print "## 📊 Mood Stats (Auto Summary)\n";
             printf "| Mood               | Count |\n";
@@ -86,7 +85,7 @@ jobs:
       }
         printf "\n_Total Entries: %d_\n\n---\n", total;
     }
-EOF
+      EOF
       awk '/^## 📊 Mood Stats/,/^---/{next} {print}' .mood-log.md > .mood-log-clean.md
       cat .mood-log-clean.md .mood-stats.md > .mood-log.md
       rm .mood-log-clean.md .mood-stats.md
