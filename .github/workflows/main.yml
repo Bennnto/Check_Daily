@@ -74,8 +74,7 @@ jobs:
             print "## 📊 Mood Stats (Auto Summary)\n";
             printf "| Mood               | Count |\n";
             printf "|--------------------|-------|\n";
-    }
-        /^\*\*Mood\*\*: / {
+      /^\*\*Mood\*\*: / {
           sub(/\*\*Mood\*\*: /, "", $0);
           counts[$0]++;
     }
