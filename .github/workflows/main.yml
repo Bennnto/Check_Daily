@@ -90,7 +90,8 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install matplotlib seaborn pandas
 
-      - name: 📊 Generate Chart
+     - name: 📊 Generate Chart
+      run: |
         cat << 'EOF' > chart.py
         import matplotlib.pyplot as plt
         import seaborn as sns
@@ -98,7 +99,7 @@ jobs:
         import re
         from datetime import datetime
         import os
-        
+    
         MOOD_SCORES = {
             '🥳 feeling myself': 5,
             '😎 chillin': 4,
@@ -110,13 +111,12 @@ jobs:
             '🤯 overwhelmed': 1,
             '😭 sad boi hours': 0
         }
-        
-        # Parse .mood-log.md
+    
         entries = []
         with open('.mood-log.md', 'r') as f:
             lines = f.readlines()
             current_date = None
-            for i, line in enumerate(lines):
+            for line in lines:
                 if '🧠 Mood Entry —' in line:
                     current_date = line.strip().split('—')[-1].strip()
                 elif '**Mood**:' in line:
@@ -124,30 +124,26 @@ jobs:
                     score = MOOD_SCORES.get(mood, None)
                     if score is not None and current_date:
                         entries.append({'date': current_date, 'score': score})
-        
-        # Create DataFrame
+    
         df = pd.DataFrame(entries)
         df['date'] = pd.to_datetime(df['date'])
         df = df.set_index('date').resample('D').max().fillna(0).reset_index()
-        
-        # Prepare for grid
-        df['dow'] = df['date'].dt.weekday  # Monday=0
+        df['dow'] = df['date'].dt.weekday
         df['week'] = df['date'].dt.isocalendar().week
         pivot = df.pivot(index='dow', columns='week', values='score')
-        
-        # Plot pastel heatmap
+    
         plt.figure(figsize=(12, 3))
-        pastel_palette = sns.light_palette("skyblue", n_colors=6, reverse=False)
+        pastel_palette = sns.light_palette("skyblue", n_colors=6)
         sns.heatmap(pivot, cmap=pastel_palette, cbar=True, linewidths=0.5, linecolor='white', square=True)
-        
         plt.yticks(ticks=range(7), labels=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], rotation=0)
         plt.title('🌈 Mood Grid (Pastel Vibes)', fontsize=12)
         plt.tight_layout()
-        
+    
         os.makedirs('assets', exist_ok=True)
         plt.savefig('assets/mood-chart.png', dpi=200)
-        " > chart.py
-          python3 chart.py
+        EOF
+    
+        python3 chart.py
 
       - name: 🖼️ Insert Mood Chart into Markdown
         run: |
