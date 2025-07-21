@@ -39,26 +39,26 @@ jobs:
           git config --global user.name "Bennnnip"
           git config --global user.email "vissarut.prom@gmail.com"
 
-           - name: 🎧 Write mood + music to .md
-             run: |
-              echo '#!/bin/bash' > write_mood.sh
-              echo 'MOOD="${{ github.event.inputs.mood }}"' >> write_mood.sh
-              echo 'NOTE="${{ github.event.inputs.note }}"' >> write_mood.sh
-              echo 'TIMESTAMP=$(date -u +"%Y-%m-%d")' >> write_mood.sh
+      - name: 🎧 Write mood + music to .md
+        run: |
+         echo '#!/bin/bash' > write_mood.sh
+         echo 'MOOD="${{ github.event.inputs.mood }}"' >> write_mood.sh
+         echo 'NOTE="${{ github.event.inputs.note }}"' >> write_mood.sh
+         echo 'TIMESTAMP=$(date -u +"%Y-%m-%d")' >> write_mood.sh
     
-              echo 'declare -A MUSIC' >> write_mood.sh
-              # ... (your MUSIC array here)
+         echo 'declare -A MUSIC' >> write_mood.sh
+         # ... (your MUSIC array here)
     
-              echo 'TRACK=${MUSIC[$MOOD]}' >> write_mood.sh
-              echo 'echo "🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md' >> write_mood.sh
-              echo 'echo "**Mood**: $MOOD" >> .mood-log.md' >> write_mood.sh
-              echo 'echo "**Note**: $NOTE" >> .mood-log.md' >> write_mood.sh
-              echo 'echo "**Track**: [Link]($TRACK)" >> .mood-log.md' >> write_mood.sh
-              echo 'echo "" >> .mood-log.md' >> write_mood.sh
-              echo 'echo "---" >> .mood-log.md' >> write_mood.sh
-              echo 'echo "" >> .mood-log.md' >> write_mood.sh
+         echo 'TRACK=${MUSIC[$MOOD]}' >> write_mood.sh
+         echo 'echo "🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md' >> write_mood.sh
+         echo 'echo "**Mood**: $MOOD" >> .mood-log.md' >> write_mood.sh
+         echo 'echo "**Note**: $NOTE" >> .mood-log.md' >> write_mood.sh
+         echo 'echo "**Track**: [Link]($TRACK)" >> .mood-log.md' >> write_mood.sh
+         echo 'echo "" >> .mood-log.md' >> write_mood.sh
+         echo 'echo "---" >> .mood-log.md' >> write_mood.sh
+         echo 'echo "" >> .mood-log.md' >> write_mood.sh
     
-              bash write_mood.shin: $MOOD — $NOTE" >> $GITHUB_ENV
+         bash write_mood.shin: $MOOD — $NOTE" >> $GITHUB_ENV
 
       - name: 📊 Generate Mood Summary
         run: |
