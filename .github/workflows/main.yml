@@ -57,7 +57,6 @@ jobs:
          echo 'echo "" >> .mood-log.md' >> write_mood.sh
          echo 'echo "---" >> .mood-log.md' >> write_mood.sh
          echo 'echo "" >> .mood-log.md' >> write_mood.sh
-    
          bash write_mood.shin: $MOOD — $NOTE" >> $GITHUB_ENV
 
       - name: 📊 Generate Mood Summary
