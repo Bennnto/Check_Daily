@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   mood_commit:
-      runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: 📦 Checkout repo
@@ -41,24 +41,24 @@ jobs:
 
       - name: 🎧 Write mood + music to .md
         run: |
-         echo '#!/bin/bash' > write_mood.sh
-         echo 'MOOD="${{ github.event.inputs.mood }}"' >> write_mood.sh
-         echo 'NOTE="${{ github.event.inputs.note }}"' >> write_mood.sh
-         echo 'TIMESTAMP=$(date -u +"%Y-%m-%d")' >> write_mood.sh
-    
-         echo 'declare -A MUSIC' >> write_mood.sh
-         # ... (your MUSIC array here)
-    
-         echo 'TRACK=${MUSIC[$MOOD]}' >> write_mood.sh
-         echo 'echo "🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md' >> write_mood.sh
-         echo 'echo "**Mood**: $MOOD" >> .mood-log.md' >> write_mood.sh
-         echo 'echo "**Note**: $NOTE" >> .mood-log.md' >> write_mood.sh
-         echo 'echo "**Track**: [Link]($TRACK)" >> .mood-log.md' >> write_mood.sh
-         echo 'echo "" >> .mood-log.md' >> write_mood.sh
-         echo 'echo "---" >> .mood-log.md' >> write_mood.sh
-         echo 'echo "" >> .mood-log.md' >> write_mood.sh
-        
-         bash write_mood.sh
+          echo '#!/bin/bash' > write_mood.sh
+          echo 'MOOD="${{ github.event.inputs.mood }}"' >> write_mood.sh
+          echo 'NOTE="${{ github.event.inputs.note }}"' >> write_mood.sh
+          echo 'TIMESTAMP=$(date -u +"%Y-%m-%d")' >> write_mood.sh
+
+          echo 'declare -A MUSIC' >> write_mood.sh
+          # Insert your MUSIC mapping here...
+
+          echo 'TRACK=${MUSIC[$MOOD]}' >> write_mood.sh
+          echo 'echo "🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md' >> write_mood.sh
+          echo 'echo "**Mood**: $MOOD" >> .mood-log.md' >> write_mood.sh
+          echo 'echo "**Note**: $NOTE" >> .mood-log.md' >> write_mood.sh
+          echo 'echo "**Track**: [Link]($TRACK)" >> .mood-log.md' >> write_mood.sh
+          echo 'echo "" >> .mood-log.md' >> write_mood.sh
+          echo 'echo "---" >> .mood-log.md' >> write_mood.sh
+          echo 'echo "" >> .mood-log.md' >> write_mood.sh
+
+          bash write_mood.sh
 
       - name: 📊 Generate Mood Summary
         run: |
@@ -90,60 +90,60 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install matplotlib seaborn pandas
 
-     - name: 📊 Generate Chart
-      run: |
-        cat << 'EOF' > chart.py
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-        import pandas as pd
-        import re
-        from datetime import datetime
-        import os
-    
-        MOOD_SCORES = {
-            '🥳 feeling myself': 5,
-            '😎 chillin': 4,
-            '🧘‍♂️ zen mode': 4,
-            '🔥 motivated': 3,
-            '😤 grinding': 3,
-            '🤖 robot mode': 2,
-            '🥱 sleepy af': 2,
-            '🤯 overwhelmed': 1,
-            '😭 sad boi hours': 0
-        }
-    
-        entries = []
-        with open('.mood-log.md', 'r') as f:
-            lines = f.readlines()
-            current_date = None
-            for line in lines:
-                if '🧠 Mood Entry —' in line:
-                    current_date = line.strip().split('—')[-1].strip()
-                elif '**Mood**:' in line:
-                    mood = re.search(r'\*\*Mood\*\*: (.+)', line).group(1).strip()
-                    score = MOOD_SCORES.get(mood, None)
-                    if score is not None and current_date:
-                        entries.append({'date': current_date, 'score': score})
-    
-        df = pd.DataFrame(entries)
-        df['date'] = pd.to_datetime(df['date'])
-        df = df.set_index('date').resample('D').max().fillna(0).reset_index()
-        df['dow'] = df['date'].dt.weekday
-        df['week'] = df['date'].dt.isocalendar().week
-        pivot = df.pivot(index='dow', columns='week', values='score')
-    
-        plt.figure(figsize=(12, 3))
-        pastel_palette = sns.light_palette("skyblue", n_colors=6)
-        sns.heatmap(pivot, cmap=pastel_palette, cbar=True, linewidths=0.5, linecolor='white', square=True)
-        plt.yticks(ticks=range(7), labels=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], rotation=0)
-        plt.title('🌈 Mood Grid (Pastel Vibes)', fontsize=12)
-        plt.tight_layout()
-    
-        os.makedirs('assets', exist_ok=True)
-        plt.savefig('assets/mood-chart.png', dpi=200)
-        EOF
-    
-        python3 chart.py
+      - name: 📊 Generate Chart
+        run: |
+          cat << 'EOF' > chart.py
+          import matplotlib.pyplot as plt
+          import seaborn as sns
+          import pandas as pd
+          import re
+          from datetime import datetime
+          import os
+
+          MOOD_SCORES = {
+              '🥳 feeling myself': 5,
+              '😎 chillin': 4,
+              '🧘‍♂️ zen mode': 4,
+              '🔥 motivated': 3,
+              '😤 grinding': 3,
+              '🤖 robot mode': 2,
+              '🥱 sleepy af': 2,
+              '🤯 overwhelmed': 1,
+              '😭 sad boi hours': 0
+          }
+
+          entries = []
+          with open('.mood-log.md', 'r') as f:
+              lines = f.readlines()
+              current_date = None
+              for line in lines:
+                  if '🧠 Mood Entry —' in line:
+                      current_date = line.strip().split('—')[-1].strip()
+                  elif '**Mood**:' in line:
+                      mood = re.search(r'\*\*Mood\*\*: (.+)', line).group(1).strip()
+                      score = MOOD_SCORES.get(mood, None)
+                      if score is not None and current_date:
+                          entries.append({'date': current_date, 'score': score})
+
+          df = pd.DataFrame(entries)
+          df['date'] = pd.to_datetime(df['date'])
+          df = df.set_index('date').resample('D').max().fillna(0).reset_index()
+          df['dow'] = df['date'].dt.weekday
+          df['week'] = df['date'].dt.isocalendar().week
+          pivot = df.pivot(index='dow', columns='week', values='score')
+
+          plt.figure(figsize=(12, 3))
+          pastel_palette = sns.light_palette("skyblue", n_colors=6)
+          sns.heatmap(pivot, cmap=pastel_palette, cbar=True, linewidths=0.5, linecolor='white', square=True)
+          plt.yticks(ticks=range(7), labels=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], rotation=0)
+          plt.title('🌈 Mood Grid (Pastel Vibes)', fontsize=12)
+          plt.tight_layout()
+
+          os.makedirs('assets', exist_ok=True)
+          plt.savefig('assets/mood-chart.png', dpi=200)
+          EOF
+
+          python3 chart.py
 
       - name: 🖼️ Insert Mood Chart into Markdown
         run: |
@@ -155,19 +155,17 @@ jobs:
         run: |
           git add .mood-log.md
           git add assets/mood-chart.png
-      
+
           COMMIT_MSG="🌈 Mood Check-in: ${{ github.event.inputs.mood }}"
           NOTE="${{ github.event.inputs.note }}"
-      
+
           if [ -n "$NOTE" ]; then
             COMMIT_MSG="$COMMIT_MSG — $NOTE"
           fi
-      
+
           if git diff --cached --quiet; then
             echo "🛑 No changes to commit."
           else
             git commit -m "$COMMIT_MSG"
             git push
           fi
-      
-           
