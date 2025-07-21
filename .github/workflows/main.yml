@@ -91,7 +91,7 @@ jobs:
           pip install matplotlib seaborn pandas
 
       - name: 📊 Generate Chart
-        echo "
+        cat << 'EOF' > chart.py
         import matplotlib.pyplot as plt
         import seaborn as sns
         import pandas as pd
