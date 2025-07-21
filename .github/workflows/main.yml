@@ -88,32 +88,65 @@ jobs:
       - name: 🐍 Set up Python
         run: |
           python3 -m pip install --upgrade pip
-          pip install matplotlib
+          pip install matplotlib seaborn pandas
 
-      - name: 📊 Generate Pie Chart
+      - name: 📊 Generate Chart
         run: |
           echo "
-          import matplotlib.pyplot as plt 
-          from collections import Counter
+          import matplotlib.pyplot as plt
+          import seaborn as sns
+          import pandas as pd
           import re
+          from datetime import datetime
           import os
-          os.makedirs('assets', exist_ok=True)
+          
+          MOOD_SCORES = {
+              '🥳 feeling myself': 5,
+              '😎 chillin': 4,
+              '🧘‍♂️ zen mode': 4,
+              '🔥 motivated': 3,
+              '😤 grinding': 3,
+              '🤖 robot mode': 2,
+              '🥱 sleepy af': 2,
+              '🤯 overwhelmed': 1,
+              '😭 sad boi hours': 0
+          }
+          
+          # Parse .mood-log.md
+          entries = []
           with open('.mood-log.md', 'r') as f:
-            lines = f.readlines()
-            
-            moods = [re.search(r'\*\*Mood\*\*: (.*?)\\n?', line).group(1) for line in lines if '**Mood**:' in line]
-            counts = Counter(moods)
-            labels = list(counts.keys())
-            sizes = list(counts.values())
-            colors = plt.cm.Paired(range(len(labels)))
-            plt.figure(figsize=(6,6))
-            plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
-            plt.title('Mood Breakdown')
-            plt.axis('equal')
-            plt.tight_layout()
-            plt.savefig('assets/mood-chart.png', dpi=200)
-            " > chart.py
-               python3 chart.py
+              lines = f.readlines()
+              current_date = None
+              for i, line in enumerate(lines):
+                  if '🧠 Mood Entry —' in line:
+                      current_date = line.strip().split('—')[-1].strip()
+                  elif '**Mood**:' in line:
+                      mood = re.search(r'\*\*Mood\*\*: (.+)', line).group(1).strip()
+                      score = MOOD_SCORES.get(mood, None)
+                      if score is not None and current_date:
+                          entries.append({'date': current_date, 'score': score})
+          
+          # Create DataFrame
+          df = pd.DataFrame(entries)
+          df['date'] = pd.to_datetime(df['date'])
+          df = df.set_index('date').resample('D').max().fillna(0).reset_index()
+          
+          # Create pivot table
+          df['dow'] = df['date'].dt.weekday  # Monday=0
+          df['week'] = df['date'].dt.isocalendar().week
+          pivot = df.pivot(index='dow', columns='week', values='score')
+          
+          # Plot heatmap
+          plt.figure(figsize=(12, 3))
+          sns.heatmap(pivot, cmap='RdYlBu_r', cbar=True, linewidths=0.5, linecolor='white', square=True)
+          plt.yticks(ticks=range(7), labels=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], rotation=0)
+          plt.title('Mood Contribution Grid (Blue = Happy, Red = Sad)', fontsize=12)
+          plt.tight_layout()
+          
+          os.makedirs('assets', exist_ok=True)
+          plt.savefig('assets/mood-chart.png', dpi=200)
+          " > chart.py
+          python3 chart.py
 
       - name: 🖼️ Insert Mood Chart into Markdown
         run: |
