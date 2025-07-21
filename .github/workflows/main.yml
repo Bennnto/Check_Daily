@@ -36,8 +36,8 @@ jobs:
 
       - name: ⚙️ Set up Git
         run: |
-          git config --global user.name "Bennnnip"
-          git config --global user.email "vissarut.prom@gmail.com"
+          git config --global user.name "Bennnto"
+          git config --global user.email "ben.promkaew@icloud.com"
 
       - name: 🎧 Write mood + music to .md
         run: |
