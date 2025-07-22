@@ -167,5 +167,6 @@ jobs:
             echo "🛑 No changes to commit."
           else
             git commit -m "$COMMIT_MSG"
+            git pull
             git push
           fi
