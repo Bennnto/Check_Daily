@@ -42,33 +42,32 @@ jobs:
       - name: 🎧 Write mood + music to .md
         shell: bash
         run: |
-          set -euo pipefail
-          MOOD_RAW='${{ github.event.inputs.mood }}'
-          NOTE='${{ github.event.inputs.note }}'
-          MOOD="$(echo "$MOOD_RAW" | tr '[:upper:]' '[:lower:]')"
-          TIMESTAMP="$(date -u +"%Y-%m-%d")"
-      
-          declare -A MUSIC=(
-            [happy]="https://open.spotify.com/playlist/37i9dQZF1DXdPec7aLTmlC"
-            [calm]="https://open.spotify.com/playlist/37i9dQZF1DWU0ScTcjJBdj"
-            [focused]="https://open.spotify.com/playlist/37i9dQZF1DX8Uebhn9wzrS"
-          )
-          TRACK="${MUSIC[$MOOD]:-https://open.spotify.com/}"
-
-          {
-            echo "🧠 Mood Entry — $TIMESTAMP"
-            echo ""
-            echo "**Mood**: ${MOOD_RAW}"
-            echo "**Note**: ${NOTE}"
-            echo "**Track**: [Link](${TRACK})"
-            echo ""
-            echo "---"
-            echo ""
-                } >> .mood-log.md
-
-          bash write_mood.sh
-
-      - name: 📊 Generate Mood Summary
+            cat > write_mood.sh <<'BASH'
+            set -euo pipefail
+            MOOD_RAW='${{ github.event.inputs.mood }}'
+            NOTE='${{ github.event.inputs.note }}'
+            MOOD="$(echo "$MOOD_RAW" | tr '[:upper:]' '[:lower:]')"
+            TIMESTAMP="$(date -u +"%Y-%m-%d")"
+            declare -A MUSIC=(
+              [happy]="https://…"
+              [calm]="https://…"
+              [focused]="https://…"
+            )
+            TRACK="${MUSIC[$MOOD]:-https://open.spotify.com/}"
+            {
+              echo "🧠 Mood Entry — $TIMESTAMP"
+              echo ""
+              echo "**Mood**: ${MOOD_RAW}"
+              echo "**Note**: ${NOTE}"
+              echo "**Track**: [Link](${TRACK})"
+              echo ""
+              echo "---"
+              echo ""
+            } >> .mood-log.md
+            BASH
+            chmod +x write_mood.sh
+            ./write_mood.sh
+            - name: 📊 Generate Mood Summary
         run: |
           awk '
           BEGIN {
