@@ -40,23 +40,31 @@ jobs:
           git config --global user.email "ben.promkaew@icloud.com"
 
       - name: 🎧 Write mood + music to .md
+        shell: bash
         run: |
-          echo '#!/bin/bash' > write_mood.sh
-          echo 'MOOD="${{ github.event.inputs.mood }}"' >> write_mood.sh
-          echo 'NOTE="${{ github.event.inputs.note }}"' >> write_mood.sh
-          echo 'TIMESTAMP=$(date -u +"%Y-%m-%d")' >> write_mood.sh
+          set -euo pipefail
+          MOOD_RAW='${{ github.event.inputs.mood }}'
+          NOTE='${{ github.event.inputs.note }}'
+          MOOD="$(echo "$MOOD_RAW" | tr '[:upper:]' '[:lower:]')"
+          TIMESTAMP="$(date -u +"%Y-%m-%d")"
+      
+          declare -A MUSIC=(
+            [happy]="https://open.spotify.com/playlist/37i9dQZF1DXdPec7aLTmlC"
+            [calm]="https://open.spotify.com/playlist/37i9dQZF1DWU0ScTcjJBdj"
+            [focused]="https://open.spotify.com/playlist/37i9dQZF1DX8Uebhn9wzrS"
+          )
+          TRACK="${MUSIC[$MOOD]:-https://open.spotify.com/}"
 
-          echo 'declare -A MUSIC' >> write_mood.sh
-          # Insert your MUSIC mapping here...
-
-          echo 'TRACK=${MUSIC[$MOOD]}' >> write_mood.sh
-          echo 'echo "🧠 Mood Entry — $TIMESTAMP" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "**Mood**: $MOOD" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "**Note**: $NOTE" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "**Track**: [Link]($TRACK)" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "---" >> .mood-log.md' >> write_mood.sh
-          echo 'echo "" >> .mood-log.md' >> write_mood.sh
+          {
+            echo "🧠 Mood Entry — $TIMESTAMP"
+            echo ""
+            echo "**Mood**: ${MOOD_RAW}"
+            echo "**Note**: ${NOTE}"
+            echo "**Track**: [Link](${TRACK})"
+            echo ""
+            echo "---"
+            echo ""
+                } >> .mood-log.md
 
           bash write_mood.sh
 
